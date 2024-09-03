@@ -8,7 +8,10 @@ async function main() {
         methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
         credentials: true,
     });
-    await app.listen(8080);
+
+    await app.listen(8080, () => {
+        console.log('Server is live & now listening on PORT 8080');
+    });
 }
 
 main();

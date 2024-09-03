@@ -8,6 +8,18 @@ export default class AuthController {
         private readonly authService: AuthService,
     ) { }
 
+    @Get('status')
+    public async statusCheck(
+        @Res() res: Response,
+    ) {
+        try {
+            return res.status(200).json({ status: 'ok' });
+        } catch (e: any) {
+            console.error(e.message);
+            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(e.message);
+        }
+    }
+
     @Post('send-verification-link')
     public async sendVerificationLink(
         @Body('email') email: string,
