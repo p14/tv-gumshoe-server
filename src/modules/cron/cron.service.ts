@@ -25,8 +25,13 @@ export default class CronService {
         private blacklistModel: Model<Blacklist>,
         @InjectModel(Subscription.name)
         private subscriptionModel: Model<Subscription>,
-    ) {
+    ) { }
 
+    @Cron(CronExpression.EVERY_10_MINUTES)
+    public handleRenderDotComUptime(): void {
+        console.log('*********************************');
+        console.log('******* RENDER.COM UPTIME *******');
+        console.log('*********************************');
     }
 
     @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
