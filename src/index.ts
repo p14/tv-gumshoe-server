@@ -13,7 +13,7 @@ const PORT = Number(process.env.PORT || 8080);
 const app = express();
 
 app.use(cors({
-    origin: [CLIENT_URL, 'http://localhost:5173'],
+    origin: [CLIENT_URL],
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
     credentials: true,
 }));
