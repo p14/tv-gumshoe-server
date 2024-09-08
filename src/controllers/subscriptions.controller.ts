@@ -24,7 +24,7 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.post('/', async (req: Request, res: Response) => {
     try {
-        const { email, expires, mediaId, signature } = req.query as { email: string, expires: string, mediaId: string, signature: string };
+        const { email, expires, mediaId, signature } = req.body as { email: string, expires: string, mediaId: string, signature: string };
 
         // Validate auth signature
         const authService = new AuthService();
@@ -65,7 +65,7 @@ router.get('/shallow-info', async (req: Request, res: Response) => {
 
 router.delete('/:mediaId', async (req: Request, res: Response) => {
     try {
-        const { email, expires, signature } = req.query as { email: string, expires: string, signature: string };
+        const { email, expires, signature } = req.body as { email: string, expires: string, signature: string };
         const { mediaId } = req.params as { mediaId: string };
 
         // Validate auth signature
