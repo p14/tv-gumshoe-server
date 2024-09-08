@@ -1,20 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { MediaContent } from './integrations.types';
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import dotenv from 'dotenv';
+import NodeCache from 'node-cache';
+import { MediaContent } from '../types/integrations.types';
 
-@Injectable()
+dotenv.config();
+
 export default class IntegrationService {
-    constructor(
-        @Inject(CACHE_MANAGER) private cacheManager: Cache
-    ) { }
+    private cacheManager: NodeCache = new NodeCache();
 
     /**
      * Retrieves an auth token for TVDB to make requests
      * @returns {Promise<string>}
      */
     private async getAuthToken(): Promise<string> {
-        const cachedToken = await this.cacheManager.get<string>('tvdb_token');
+        const cachedToken = this.cacheManager.get<string>('tvdb_token');
 
         if (cachedToken) {
             return cachedToken;
@@ -30,7 +29,7 @@ export default class IntegrationService {
         });
 
         const cacheTimeLimit = (1000 * 60 * 60 * 24 * 7); // 1 week
-        await this.cacheManager.set('tvdb_token', response.data.token, cacheTimeLimit);
+        this.cacheManager.set('tvdb_token', response.data.token, cacheTimeLimit);
 
         return response.data.token;
     }
@@ -79,7 +78,7 @@ export default class IntegrationService {
      * @returns {Promise<MediaContent>}
      */
     public async getShow(id: string): Promise<MediaContent> {
-        const cachedShow = await this.cacheManager.get<MediaContent>(`tvdb_series_${id}`);
+        const cachedShow = this.cacheManager.get<MediaContent>(`tvdb_series_${id}`);
 
         if (cachedShow) {
             return cachedShow;
@@ -118,7 +117,7 @@ export default class IntegrationService {
         }
 
         const cacheTimeLimit = (1000 * 60 * 60 * 24); // 1 day
-        await this.cacheManager.set(`tvdb_series_${id}`, parsedShowData, cacheTimeLimit);
+        this.cacheManager.set(`tvdb_series_${id}`, parsedShowData, cacheTimeLimit);
 
         return parsedShowData;
     }

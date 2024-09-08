@@ -11,4 +11,3 @@ export type SendVerificationLinkRequest = {
 export type BlacklistEmailRequest = {
     email: string
 };
-

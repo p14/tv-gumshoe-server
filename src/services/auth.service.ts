@@ -1,20 +1,14 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import MailerService from '../mailer/mailer.service';
 import { compare } from 'bcrypt';
-import { AuthSignatureData, BlacklistEmailRequest, SendVerificationLinkRequest } from './auth.types';
-import { Blacklist } from './blacklist.schema';
+import dotenv from 'dotenv';
+import { Model } from 'mongoose';
+import { Blacklist, BlacklistDocument } from '../models/blacklist.model';
+import { AuthSignatureData, BlacklistEmailRequest, SendVerificationLinkRequest } from '../types/auth.types';
+import MailerService from './mailer.service';
 
-@Injectable()
+dotenv.config();
+
 export default class AuthService {
-    constructor(
-        @InjectModel(Blacklist.name)
-        private blacklistModel: Model<Blacklist>,
-        @Inject()
-        private mailerService: MailerService,
-    ) { }
-
+    private blacklistModel: Model<BlacklistDocument> = Blacklist;
 
     /**
      * Sends an auth validation link to the provided email address
@@ -28,7 +22,8 @@ export default class AuthService {
         const blacklisted = await this.blacklistModel.findOne({ email });
 
         if (!blacklisted) {
-            await this.mailerService.sendVerificationLink({ email });
+            const mailerService = new MailerService();
+            await mailerService.sendVerificationLink({ email });
         }
     }
 

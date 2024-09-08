@@ -1,19 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Subscription } from './subscriptions.schema';
-import { CreateSubscriptionRequest, DeleteSubscriptionRequest, ListSubscriptionContentByEmailRequest } from './subscriptions.types';
-import IntegrationService from '../integrations/integrations.service';
-import { MediaContent } from '../integrations/integrations.types';
+import { CreateSubscriptionRequest, DeleteSubscriptionRequest, ListSubscriptionContentByEmailRequest } from '../types/subscriptions.types';
+import IntegrationService from '../services/integrations.service';
+import { MediaContent } from '../types/integrations.types';
+import { Subscription, SubscriptionDocument } from '../models/subscriptions.model';
 
-@Injectable()
 export default class SubscriptionService {
-    constructor(
-        @InjectModel(Subscription.name)
-        private subscriptionModel: Model<Subscription>,
-        @Inject()
-        private integrationService: IntegrationService,
-    ) { }
+    private subscriptionModel: Model<SubscriptionDocument> = Subscription;
 
     /**
      * Retrieves subscriptions and media content by the provided email address
@@ -29,12 +21,14 @@ export default class SubscriptionService {
             return [];
         }
 
+        const integrationService = new IntegrationService();
+
         const { mediaContent, errors } = await subscription.mediaIds
             .reduce(async (accPromise, mediaId) => {
                 const acc = await accPromise;
 
                 try {
-                    const mediaContent = await this.integrationService.getShow(mediaId);
+                    const mediaContent = await integrationService.getShow(mediaId);
                     acc.mediaContent.push({ ...mediaContent });
                 } catch (error) {
                     acc.errors.push(mediaId);

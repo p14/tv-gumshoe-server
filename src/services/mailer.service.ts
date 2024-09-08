@@ -1,16 +1,14 @@
-import { Injectable } from '@nestjs/common';
 import { hash } from 'bcrypt';
+import dotenv from 'dotenv';
 import { createTransport, Transporter } from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
-import { AuthSignatureData } from '../auth/auth.types';
-import { DailyNotificationRequest, VerificationLinkRequest } from './mailer.types';
-import { buildDailyNotificationEmail } from './templates/daily_notification.template';
-import { buildMagicLinkEmail } from './templates/magic_link.template';
+import { AuthSignatureData } from '../types/auth.types';
+import { DailyNotificationRequest, VerificationLinkRequest } from '../types/mailer.types';
+import { buildDailyNotificationEmail, buildMagicLinkEmail } from '../utilities/email_templates';
 
-@Injectable()
+dotenv.config();
+
 export default class MailerService {
-    constructor() { }
-
     /**
      * Builds a nodemailer transporter to handle sending emails
      * @returns {Transporter<SMTPTransport.SentMessageInfo>}
