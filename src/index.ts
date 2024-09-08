@@ -8,12 +8,12 @@ import CronService from './services/cron.service';
 dotenv.config();
 const CLIENT_URL = String(process.env.CLIENT_URL);
 const MONGO_URL = String(process.env.MONGO_URL);
-const PORT = Number(process.env.PORT);
+const PORT = Number(process.env.PORT || 8080);
 
 const app = express();
 
 app.use(cors({
-    origin: [CLIENT_URL],
+    origin: [CLIENT_URL, 'http://localhost:5173'],
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
     credentials: true,
 }));
