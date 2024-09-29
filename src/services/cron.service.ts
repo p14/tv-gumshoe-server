@@ -25,9 +25,7 @@ export default class CronService {
     }
 
     public async handleDailyPoll(): Promise<void> {
-        console.log('*********************************');
         console.log('***** STARTING NIGHTLY POLL *****');
-        console.log('*********************************');
 
         try {
             // Get all blacklisted email addresses
@@ -37,22 +35,27 @@ export default class CronService {
             // Pull all subscriptions and group by email address
             const allSubscriptions = await this.subscriptionModel.find({});
 
+            // Track the number of emails sent out
+            let sentEmails = 0;
+
             // Loop through each user's subscriptions and see if there is a new episode today
-            await Promise.all(
+            await Promise.allSettled(
                 allSubscriptions
                     .filter((userSubscription) => !blacklistedEmails.includes(userSubscription.email))
                     .map(async (userSubscription) => {
                         const seriesToday = await this.getSeriesPremieringToday(userSubscription.mediaIds);
                         await this.sendNotificationEmail({ email: userSubscription.email, seriesToday });
+                        sentEmails++;
                     })
             );
+
+            // Log the numbers of emails sent
+            console.log(`Sent notifications to ${sentEmails} out of the ${allSubscriptions.length} users polled.`);
         } catch (error) {
             console.error('Error during nightly poll:', error);
         }
 
-        console.log('*********************************');
         console.log('****** ENDING NIGHTLY POLL ******');
-        console.log('*********************************');
     }
 
     private async getSeriesPremieringToday(mediaIds: string[]): Promise<string[]> {
